@@ -1,6 +1,6 @@
 # gatsby-source-trello-board
 
-Source plugin for pulling data into [Gatsby](~https://www.gatsbyjs.org/~) from a [Trello](~https://trello.com~) board.
+Source plugin for pulling data into [Gatsby](https://www.gatsbyjs.org/) from a [Trello](https://trello.com) board.
 
 ## Install
 
@@ -19,7 +19,7 @@ In your gatsby-config.js :
 }
 ```
 
-Dont forget to use [Environment Variables](~https://www.gatsbyjs.org/docs/environment-variables/~) if you want to keep your key and token private.
+Dont forget to use [Environment Variables](https://www.gatsbyjs.org/docs/environment-variables/) if you want to keep your key and token private.
 
 ## How to query
 
@@ -57,7 +57,7 @@ Dont forget to use [Environment Variables](~https://www.gatsbyjs.org/docs/enviro
 }
 ```
 
-You also can write markdown in _Description_, it supports [gatsby-transformer-remark](~https://www.gatsbyjs.org/packages/gatsby-transformer-remark/~).
+You also can write markdown in _Description_, it supports [gatsby-transformer-remark](https://www.gatsbyjs.org/packages/gatsby-transformer-remark/).
 
 ```graphql
 {
@@ -73,7 +73,7 @@ You also can write markdown in _Description_, it supports [gatsby-transformer-re
 }
 ```
 
-Card’s attachments are downloaded so [gatsby-image](~https://www.gatsbyjs.org/packages/gatsby-image/~) can be used.
+Card’s attachments are downloaded so [gatsby-image](https://www.gatsbyjs.org/packages/gatsby-image/) can be used.
 
 - **childrenCardMedia**: Array of card’s attachments
 
