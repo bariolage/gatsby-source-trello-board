@@ -11,19 +11,11 @@ In your gatsby-config.js :
 ```graphql
 {
   resolve: `gatsby-source-trello-board`,
-<<<<<<< HEAD
-    options: {
-    key: `<your Trello key>`,
-    token: `<your Trello token>`,
-    board_id: `<your Trello Board id>`,
-    }
-=======
   options: {
     key: `<your Trello key>`,
     token: `<your Trello token>`,
     board_id: `<your Trello Board id>`,
   }
->>>>>>> 7e88f58406d837afea96f26f5b959f9deb9ab78b
 }
 ```
 
