@@ -10,12 +10,12 @@ In your gatsby-config.js :
 
 ```graphql
 {
-resolve: `gatsby-source-trello-board`,
-options: {
-key: `<your Trello key>`,
-token: `<your Trello token>`,
-board_id: `<your Trello Board id>`,
-}
+  resolve: `gatsby-source-trello-board`,
+  options: {
+    key: `<your Trello key>`,
+    token: `<your Trello token>`,
+    board_id: `<your Trello Board id>`,
+  }
 }
 ```
 
