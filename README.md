@@ -25,11 +25,11 @@ Dont forget to use [Environment Variables](~https://www.gatsbyjs.org/docs/enviro
 
 **Gatsby-source-trello-board** will fetch information of each card of the board :
 
-- **list_index**: list’s position in the board
+- **list_index**: list position in the board
 - **list_id**: id of the list
 - **list_slug**: name of the list slugified
 - **list_name**: name of the list
-- **index**: card’s position in the board
+- **index**: card position in the board
 - **id**: id of the list
 - **slug**: name of the card slugified
 - **name**: name of the card
