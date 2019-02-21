@@ -1,6 +1,6 @@
 {
   "name": "gatsby-source-trello-board",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Gatsby source plugin for trello",
   "main": "index.js",
   "homepage": "https://github.com/ohkaiju/gatsby-source-trello-board",
