@@ -23,7 +23,7 @@ Dont forget to use [Environment Variables](~https://www.gatsbyjs.org/docs/enviro
 
 ## How to query
 
-**Gatsby-source-trello-board** will fetch information of ~each card of the board~ :
+**Gatsby-source-trello-board** will fetch information of each card of the board :
 
 - **list_index**: list’s position in the board
 - **list_id**: id of the list
