@@ -1,9 +1,11 @@
-const { getTrelloCards } = require('./fetch');
-const { normalize } = require('./normalize');
+const { getTrelloCards } = require("./fetch");
+
+const { normalize } = require("./normalize");
 /**
  * FETCH ALL CARDS
  * ON NODE FOR EACH
  */
+
 exports.sourceNodes = async (
   {
     actions: { createNode, touchNode, createParentChildLink },
@@ -15,6 +17,7 @@ exports.sourceNodes = async (
   pluginOptions
 ) => {
   const data = await getTrelloCards(pluginOptions);
+
   try {
     await Promise.all(
       data.map(async card => {
@@ -36,6 +39,7 @@ exports.sourceNodes = async (
         /**
          * DOWNLOAD MEDIAS & MEDIANODE INIT
          */
+
         if (cardNode.medias) {
           await Promise.all(
             cardNode.medias.map(async m => {
@@ -46,11 +50,15 @@ exports.sourceNodes = async (
                 store,
                 cache,
                 media: {
-                  pos: m.pos,
+                  list_name: cardNode.list_name,
+                  list_slug: cardNode.list_slug,
+                  card_slug: cardNode.slug,
+                  card_name: cardNode.name,
+                  slug: m.slug,
                   url: m.url,
                   id: m.id,
                   name: m.name,
-                  parent: `__SOURCE__`,
+                  parent: cardNode.id,
                   children: [],
                   internal: {
                     type: `CardMedia`,
@@ -58,14 +66,16 @@ exports.sourceNodes = async (
                   }
                 }
               });
+
+              createNode(mediaNode);
               createParentChildLink({
                 parent: cardNode,
                 child: mediaNode
               });
-              createNode(mediaNode);
             })
           );
         }
+
         return;
       })
     );
