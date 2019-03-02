@@ -3,6 +3,9 @@
 Source plugin for pulling data into [Gatsby](https://www.gatsbyjs.org/) from a [Trello](https://trello.com) board.
 
 ## Install
+```
+ npm install --save gatsby-source-trello-board
+```
 
 ## How to use
 
