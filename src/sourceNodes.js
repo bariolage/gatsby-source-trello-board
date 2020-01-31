@@ -1,10 +1,9 @@
 const { getTrelloCards } = require("./fetch");
 
 const { normalize } = require("./normalize");
-/**
- * FETCH ALL CARDS
- * ON NODE FOR EACH
- */
+
+// FETCH ALL CARDS
+// ON NODE FOR EACH
 
 exports.sourceNodes = async (
   {
@@ -14,16 +13,15 @@ exports.sourceNodes = async (
     createContentDigest,
     createNodeId
   },
-  pluginOptions
+  configOptions
 ) => {
-  const data = await getTrelloCards(pluginOptions);
-
+  const data = await getTrelloCards(configOptions);
+  console.log(`Fetching from Trello...`);
+  let cardCount = 0;
   try {
     await Promise.all(
       data.map(async card => {
-        /**
-         * CARDNODE INIT
-         */
+        // CARDNODE INIT
         const cardNode = {
           ...card,
           parent: `__SOURCE__`,
@@ -36,10 +34,8 @@ exports.sourceNodes = async (
         };
         cardNode.internal.contentDigest = createContentDigest(cardNode);
         createNode(cardNode);
-        /**
-         * DOWNLOAD MEDIAS & MEDIANODE INIT
-         */
-
+        cardCount++;
+        // DOWNLOAD MEDIAS & MEDIANODE INIT
         if (cardNode.medias) {
           await Promise.all(
             cardNode.medias.map(async m => {
@@ -82,4 +78,5 @@ exports.sourceNodes = async (
   } catch (error) {
     console.log(`ERROR while creating nodes : ${error}`);
   }
+  console.log(`....................... ${cardCount} cards.`);
 };

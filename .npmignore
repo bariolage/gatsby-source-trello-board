@@ -34,3 +34,5 @@ examples
 .prettierrc
 .eslintrc.json
 .vscode
+example
+.DS_Store
