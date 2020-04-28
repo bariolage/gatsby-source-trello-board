@@ -1,7 +1,10 @@
-const { equal } = require('assert');
+const { deepEqual, equal } = require('assert');
 const nock = require('nock');
 
 const { getTrelloCards } = require('../src/fetch');
+
+const FAKE_PARAMS = {key: 'key', token: 'token', board_id: '1234556'};
+const FAKE_DUE_DATE = '2020-04-29T01:55:00.000Z';
 
 describe('Data fetched from Trello', function() {
   this.beforeEach(function() {
@@ -9,17 +12,28 @@ describe('Data fetched from Trello', function() {
   });
 
   it('includes all the cards from the board', async function() {
-    const results = await getTrelloCards('key', 'token', 'board_id');
+    const results = await getTrelloCards(FAKE_PARAMS);
 
     equal(results.length, 4);
+  });
+
+  describe('Each Card', function() {
+    it('includes due date', async function() {
+      const results = await getTrelloCards(FAKE_PARAMS);
+
+      for (result of results) {
+        deepEqual(result.due, FAKE_DUE_DATE);
+      }
+    });
   });
 });
 
 function mockTrelloResponses() {
-  const TRELLO_API_URL = 'https://api.trello.com/1';
+  const TRELLO_API_URL = 'https://api.trello.com';
+  const scope = nock(`${TRELLO_API_URL}`);
 
-  nock(`${TRELLO_API_URL}`)
-    .get(/\/boards\/\w+\/lists/)
+  scope.get(`/1/boards/${FAKE_PARAMS.board_id}/lists`)
+    .query(true)
     .reply(200, [
       {
           'id': '59a342987202eb8c13ee6cb2',
@@ -31,8 +45,7 @@ function mockTrelloResponses() {
       }
     ]);
 
-  nock(`${TRELLO_API_URL}`)
-    .get('/list/5bbd6f16ec4e618a3dedd825/cards')
+  scope.get('/1/list/5bbd6f16ec4e618a3dedd825/cards')
     .query(true)
     .reply(200, [
       {
@@ -45,31 +58,36 @@ function mockTrelloResponses() {
       },
     ]);
 
-  nock(`${TRELLO_API_URL}`)
-    .get('/list/59a342987202eb8c13ee6cb2/cards')
+  scope.get('/1/list/59a342987202eb8c13ee6cb2/cards')
     .query(true)
     .reply(200, [
       {
         'id': '5bd6336f4ba8c62e479ccca8',
-        'name': 'Mushroom Risotto'
+        'name': 'Mushroom Risotto',
       },
       {
         'id': '5c8ecc20c4336c616b57410d',
-        'name': 'Sloppy Joes'
+        'name': 'Sloppy Joes',
       },
     ]);
 
-  const pathWithIdCapturing = /\/cards\/(\w+)/;
-  nock(`${TRELLO_API_URL}`)
-    .get(pathWithIdCapturing)
+  const pathWithIdCapturing = /\/1\/cards\/(\w+)/;
+  scope.get(pathWithIdCapturing)
+    .query(queryObject => {
+      equal(queryObject.fields, 'id,name,desc,due');
+      return true;
+    })
     .reply(200, (uri) => {
       const cardId = uri.match(pathWithIdCapturing)[1];
       return {
         'attachments': [],
         'desc': `Description of ${cardId}`,
         'id': cardId,
-        'name': `Name of ${cardId}`
+        'name': `Name of ${cardId}`,
+        'due': FAKE_DUE_DATE,
       }
     })
-    .persist();
+
+  scope.persist();
+  return scope;
 }

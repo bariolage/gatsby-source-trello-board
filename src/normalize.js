@@ -17,7 +17,6 @@ exports.normalize = async ({
     if (cacheRemoteData) {
       fileNodeID = cacheRemoteData.fileNodeID;
       touchNode({ nodeId: cacheRemoteData.fileNodeID });
-      //console.log(`${media.name}'s file all ready exist`)
     }
 
     if (!fileNodeID) {
