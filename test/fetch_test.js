@@ -1,10 +1,12 @@
 const { deepEqual, equal } = require('assert');
+const faker = require('faker');
 const nock = require('nock');
 
 const { getTrelloCards } = require('../src/fetch');
 
-const FAKE_PARAMS = {key: 'key', token: 'token', board_id: '1234556'};
-const FAKE_DUE_DATE = '2020-04-29T01:55:00.000Z';
+const fakeParams = {key: 'key', token: 'token', board_id: '1234556'};
+const fakeDueDate = faker.date.future().toISOString();
+const fakeUrl = faker.internet.url();
 
 describe('Data fetched from Trello', function() {
   this.beforeEach(function() {
@@ -12,27 +14,27 @@ describe('Data fetched from Trello', function() {
   });
 
   it('includes all the cards from the board', async function() {
-    const results = await getTrelloCards(FAKE_PARAMS);
+    const results = await getTrelloCards(fakeParams);
 
     equal(results.length, 4);
   });
 
   describe('Each Card', function() {
     it('includes due date', async function() {
-      const results = await getTrelloCards(FAKE_PARAMS);
+      const results = await getTrelloCards(fakeParams);
 
       for (result of results) {
-        deepEqual(result.due, FAKE_DUE_DATE);
+        deepEqual(result.due, fakeDueDate);
+        equal(result.url, fakeUrl);
       }
     });
   });
 });
 
 function mockTrelloResponses() {
-  const TRELLO_API_URL = 'https://api.trello.com';
-  const scope = nock(`${TRELLO_API_URL}`);
+  const scope = nock('https://api.trello.com');
 
-  scope.get(`/1/boards/${FAKE_PARAMS.board_id}/lists`)
+  scope.get(`/1/boards/${fakeParams.board_id}/lists`)
     .query(true)
     .reply(200, [
       {
@@ -74,7 +76,7 @@ function mockTrelloResponses() {
   const pathWithIdCapturing = /\/1\/cards\/(\w+)/;
   scope.get(pathWithIdCapturing)
     .query(queryObject => {
-      equal(queryObject.fields, 'id,name,desc,due');
+      equal(queryObject.fields, 'id,name,desc,due,url');
       return true;
     })
     .reply(200, (uri) => {
@@ -84,7 +86,8 @@ function mockTrelloResponses() {
         'desc': `Description of ${cardId}`,
         'id': cardId,
         'name': `Name of ${cardId}`,
-        'due': FAKE_DUE_DATE,
+        'due': fakeDueDate,
+        'url': fakeUrl,
       }
     })
 

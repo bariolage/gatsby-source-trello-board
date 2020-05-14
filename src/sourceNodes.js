@@ -3,9 +3,9 @@ const fetch = require("./fetch");
 const { normalize } = require("./normalize");
 
 // FETCH ALL CARDS
-// ON NODE FOR EACH
+// ONE NODE FOR EACH
 
-exports.sourceNodes = async (
+async function sourceNodes(
   {
     actions: { createNode, touchNode, createParentChildLink },
     store,
@@ -14,7 +14,7 @@ exports.sourceNodes = async (
     createNodeId
   },
   configOptions
-) => {
+) {
   const data = await fetch.getTrelloCards(configOptions);
   console.log(`Fetching from Trello...`);
   let cardCount = 0;
@@ -86,4 +86,4 @@ function toCardNode(card) {
   }
 }
 
-exports.toCardNode = toCardNode;
+module.exports = { sourceNodes, toCardNode };

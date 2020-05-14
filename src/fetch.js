@@ -23,7 +23,7 @@ exports.getTrelloCards = async ({
         const {
           data
         } = await getData(
-          `cards/${card.id}?fields=id,name,desc,due&attachments=true&attachment_fields=id,url,name,pos`
+          `cards/${card.id}?fields=id,name,desc,due,url&attachments=true&attachment_fields=id,url,name,pos`
         );
         const medias = [];
 
@@ -60,6 +60,7 @@ exports.getTrelloCards = async ({
           content: data.desc,
           medias: medias || null,
           due: data.due,
+          url: data.url,
         });
       }));
     }));

@@ -18,6 +18,7 @@ describe('Graphql', function() {
       content: 'This is a card from a Trello Board',
       medias: null,
       due: '2020-04-29T01:55:00.000Z',
+      url: 'https://trello.com/c/LMEy1myI/47-fruits',
     }
   ];
 
@@ -30,7 +31,7 @@ describe('Graphql', function() {
   })
 
   it('works', async () => {
-    const logStub = sinon.stub(console, 'log');
+    const logStub = sinon.spy(console, 'log');
 
     await sourceNodes({
       actions: {
@@ -46,7 +47,7 @@ describe('Graphql', function() {
   });
 
   describe('trelloCard node properties', function() {
-    it('includes due date', function() {
+    it('includes properties', function() {
       const cardNode = toCardNode(mockCards[0]);
 
       deepEqual(cardNode.due, new Date(mockCards[0].due));
