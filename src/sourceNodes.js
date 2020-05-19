@@ -22,10 +22,28 @@ async function sourceNodes(
     await Promise.all(
       data.map(async card => {
         // CARDNODE INIT
-        const cardNode = toCardNode(card);
-        cardNode.internal.contentDigest = createContentDigest(cardNode);
+        const cardNode = toCardNode(card, createContentDigest);
         createNode(cardNode);
         cardCount++;
+
+        // Create checklist nodes
+        card.checklists.forEach((checklist) => {
+          const checklistNode = toCheckListNode(checklist, createContentDigest);
+          createNode(checklistNode);
+          createParentChildLink({ parent: cardNode, child: checklistNode });
+          checklist.checkItems.forEach(checklistItem => {
+            const checklistItemNode = toCheckListItemNode(
+              checklistItem,
+              createContentDigest
+            );
+            createNode(checklistItemNode);
+            createParentChildLink({
+              parent: checklistNode,
+              child: checklistItemNode,
+            });
+          })
+        });
+
         // DOWNLOAD MEDIAS & MEDIANODE INIT
         if (cardNode.medias) {
           await Promise.all(
@@ -72,8 +90,8 @@ async function sourceNodes(
   console.log(`....................... ${cardCount} cards.`);
 };
 
-function toCardNode(card) {
-  return {
+function toCardNode(card, createContentDigest) {
+  const node = {
     ...card,
     due: !card.due ? null : new Date(card.due),
     parent: '__SOURCE__',
@@ -82,8 +100,37 @@ function toCardNode(card) {
       type: 'TrelloCard',
       content: card.content,
       mediaType: 'text/markdown'
-    }
-  }
+    },
+  };
+  node.internal.contentDigest = createContentDigest(node);
+  return node;
 }
 
-module.exports = { sourceNodes, toCardNode };
+function toCheckListNode(checklist, createContentDigest) {
+  return {
+    id: checklist.id,
+    name: checklist.name,
+    internal: {
+      type: 'TrelloBoardChecklist',
+      contentDigest: createContentDigest(checklist),
+    },
+  };
+}
+
+function toCheckListItemNode(checklistItem, createContentDigest) {
+  return {
+    id: checklistItem.id,
+    name: checklistItem.name,
+    internal: {
+      type: 'TrelloBoardChecklistItem',
+      contentDigest: createContentDigest(checklistItem),
+    }
+  };
+}
+
+module.exports = {
+  sourceNodes,
+  toCardNode,
+  toCheckListItemNode,
+  toCheckListNode,
+};

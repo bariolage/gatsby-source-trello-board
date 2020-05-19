@@ -20,12 +20,13 @@ describe('Data fetched from Trello', function() {
   });
 
   describe('Each Card', function() {
-    it('includes due date', async function() {
+    it('includes properties', async function() {
       const results = await getTrelloCards(fakeParams);
 
       for (result of results) {
         deepEqual(result.due, fakeDueDate);
         equal(result.url, fakeUrl);
+        equal(result.checklists.length, 1);
       }
     });
   });
@@ -77,6 +78,8 @@ function mockTrelloResponses() {
   scope.get(pathWithIdCapturing)
     .query(queryObject => {
       equal(queryObject.fields, 'id,name,desc,due,url');
+      equal(queryObject.checklists, 'all');
+      equal(queryObject.checklist_fields, 'name,id');
       return true;
     })
     .reply(200, (uri) => {
@@ -88,6 +91,14 @@ function mockTrelloResponses() {
         'name': `Name of ${cardId}`,
         'due': fakeDueDate,
         'url': fakeUrl,
+        'checklists': [{
+          checkItems: [
+            { id: "123123", name: "1 pound of dates"},
+            { id: "646464", name: "4 large yams"},
+          ],
+          id: "59ae06d39f754ff22ca604ee",
+          name: "Fruits Grown in Quebec",
+        }],
       }
     })
 
