@@ -36,6 +36,8 @@ Dont forget to use [Environment Variables](https://www.gatsbyjs.org/docs/environ
 - **id**: id of the list
 - **slug**: name of the card slugified
 - **name**: name of the card
+- **due**: due date that is set on card
+- **url**: url of the card
 
 ```graphql
 {

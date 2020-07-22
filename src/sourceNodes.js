@@ -1,11 +1,11 @@
-const { getTrelloCards } = require("./fetch");
+const fetch = require("./fetch");
 
 const { normalize } = require("./normalize");
 
 // FETCH ALL CARDS
-// ON NODE FOR EACH
+// ONE NODE FOR EACH
 
-exports.sourceNodes = async (
+async function sourceNodes(
   {
     actions: { createNode, touchNode, createParentChildLink },
     store,
@@ -14,27 +14,36 @@ exports.sourceNodes = async (
     createNodeId
   },
   configOptions
-) => {
-  const data = await getTrelloCards(configOptions);
+) {
+  const data = await fetch.getTrelloCards(configOptions);
   console.log(`Fetching from Trello...`);
   let cardCount = 0;
   try {
     await Promise.all(
       data.map(async card => {
         // CARDNODE INIT
-        const cardNode = {
-          ...card,
-          parent: `__SOURCE__`,
-          children: [],
-          internal: {
-            type: `TrelloCard`,
-            content: card.content,
-            mediaType: `text/markdown`
-          }
-        };
-        cardNode.internal.contentDigest = createContentDigest(cardNode);
+        const cardNode = toCardNode(card, createContentDigest);
         createNode(cardNode);
         cardCount++;
+
+        // Create checklist nodes
+        card.checklists.forEach((checklist) => {
+          const checklistNode = toCheckListNode(checklist, createContentDigest);
+          createNode(checklistNode);
+          createParentChildLink({ parent: cardNode, child: checklistNode });
+          checklist.checkItems.forEach(checklistItem => {
+            const checklistItemNode = toCheckListItemNode(
+              checklistItem,
+              createContentDigest
+            );
+            createNode(checklistItemNode);
+            createParentChildLink({
+              parent: checklistNode,
+              child: checklistItemNode,
+            });
+          })
+        });
+
         // DOWNLOAD MEDIAS & MEDIANODE INIT
         if (cardNode.medias) {
           await Promise.all(
@@ -79,4 +88,49 @@ exports.sourceNodes = async (
     console.log(`ERROR while creating nodes : ${error}`);
   }
   console.log(`....................... ${cardCount} cards.`);
+};
+
+function toCardNode(card, createContentDigest) {
+  const node = {
+    ...card,
+    due: !card.due ? null : new Date(card.due),
+    parent: '__SOURCE__',
+    children: [],
+    internal: {
+      type: 'TrelloCard',
+      content: card.content,
+      mediaType: 'text/markdown'
+    },
+  };
+  node.internal.contentDigest = createContentDigest(node);
+  return node;
+}
+
+function toCheckListNode(checklist, createContentDigest) {
+  return {
+    id: checklist.id,
+    name: checklist.name,
+    internal: {
+      type: 'TrelloBoardChecklist',
+      contentDigest: createContentDigest(checklist),
+    },
+  };
+}
+
+function toCheckListItemNode(checklistItem, createContentDigest) {
+  return {
+    id: checklistItem.id,
+    name: checklistItem.name,
+    internal: {
+      type: 'TrelloBoardChecklistItem',
+      contentDigest: createContentDigest(checklistItem),
+    }
+  };
+}
+
+module.exports = {
+  sourceNodes,
+  toCardNode,
+  toCheckListItemNode,
+  toCheckListNode,
 };

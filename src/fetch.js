@@ -22,7 +22,9 @@ exports.getTrelloCards = async ({
       await Promise.all(cards.map(async (card, e) => {
         const {
           data
-        } = await getData(`cards/${card.id}?fields=id,name,desc&attachments=true&attachment_fields=id,url,name,pos`);
+        } = await getData(
+          `cards/${card.id}?fields=id,name,desc,due,url&checklists=all&checklist_fields=name,id&attachments=true&attachment_fields=id,url,name,pos`
+        );
         const medias = [];
 
         if (data.attachments.length) {
@@ -56,7 +58,10 @@ exports.getTrelloCards = async ({
           }),
           name: data.name,
           content: data.desc,
-          medias: medias || null
+          medias: medias || null,
+          due: data.due,
+          url: data.url,
+          checklists: data.checklists,
         });
       }));
     }));
