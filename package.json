@@ -17,7 +17,7 @@
     "trello"
   ],
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "gatsby-source-filesystem": "^2.1.47",
     "slugify": "^1.3.4"
   },
