@@ -28,15 +28,16 @@ Dont forget to use [Environment Variables](https://www.gatsbyjs.org/docs/environ
 
 **Gatsby-source-trello-board** will fetch information of each card of the board :
 
-- **list_index**: list position in the board
-- **list_id**: id of the list
-- **list_slug**: name of the list slugified
-- **list_name**: name of the list
-- **index**: card position in the board
-- **id**: id of the list
-- **slug**: name of the card slugified
-- **name**: name of the card
 - **due**: due date that is set on card
+- **id**: id of the list
+- **index**: card position in the board
+- **labels**: array of labels on the card
+- **list_id**: id of the list
+- **list_index**: list position in the board
+- **list_name**: name of the list
+- **list_slug**: name of the list slugified
+- **name**: name of the card
+- **slug**: name of the card slugified
 - **url**: url of the card
 
 ```graphql
@@ -47,15 +48,16 @@ Dont forget to use [Environment Variables](https://www.gatsbyjs.org/docs/environ
   ) {
     edges {
       node {
-        list_index
-        list_id
-        list_slug
-        list_name
-        index
-        id
-        slug
-        name
         content
+        id
+        index
+        labels
+        list_id
+        list_index
+        list_name
+        list_slug
+        name
+        slug
       }
     }
   }
