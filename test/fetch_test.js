@@ -1,32 +1,48 @@
 const { deepEqual, equal } = require('assert');
-const faker = require('faker');
+const { faker } = require('@faker-js/faker');
 const nock = require('nock');
 
 const { getTrelloCards } = require('../src/fetch');
 
-const fakeParams = {key: 'key', token: 'token', board_id: '1234556'};
+const fakeParams = { key: 'key', token: 'token', board_id: '1234556' };
 const fakeDueDate = faker.date.future().toISOString();
 const fakeUrl = faker.internet.url();
 
-describe('Data fetched from Trello', function() {
-  this.beforeEach(function() {
+function createRandomLabel() {
+  return {
+    id: faker.datatype.uuid(),
+    name: faker.word.adjective(),
+    color: faker.color.rgb(),
+    idBoard: fakeParams.board_id,
+  }
+}
+
+const fakeLabels = [
+  createRandomLabel(),
+  createRandomLabel(),
+  createRandomLabel()
+]
+
+describe('Data fetched from Trello', function () {
+  this.beforeEach(function () {
     mockTrelloResponses();
   });
 
-  it('includes all the cards from the board', async function() {
+  it('includes all the cards from the board', async function () {
     const results = await getTrelloCards(fakeParams);
 
     equal(results.length, 4);
   });
 
-  describe('Each Card', function() {
-    it('includes properties', async function() {
+  describe('Each Card', function () {
+    it('includes properties', async function () {
       const results = await getTrelloCards(fakeParams);
 
       for (result of results) {
         deepEqual(result.due, fakeDueDate);
         equal(result.url, fakeUrl);
         equal(result.checklists.length, 1);
+        deepEqual(result.labels, fakeLabels);
       }
     });
   });
@@ -39,12 +55,12 @@ function mockTrelloResponses() {
     .query(true)
     .reply(200, [
       {
-          'id': '59a342987202eb8c13ee6cb2',
-          'name': 'Main Course'
+        'id': '59a342987202eb8c13ee6cb2',
+        'name': 'Main Course'
       },
       {
-          'id': '5bbd6f16ec4e618a3dedd825',
-          'name': 'Deserts'
+        'id': '5bbd6f16ec4e618a3dedd825',
+        'name': 'Deserts'
       }
     ]);
 
@@ -52,12 +68,12 @@ function mockTrelloResponses() {
     .query(true)
     .reply(200, [
       {
-          'id': '586353f89d7be8c1d43c8340',
-          'name': 'Vegan Pancakes / crèpes (crepes)'
+        'id': '586353f89d7be8c1d43c8340',
+        'name': 'Vegan Pancakes / crèpes (crepes)'
       },
       {
-          'id': '58d7067d1d60ebd072c43bc6',
-          'name': 'Banana Bread'
+        'id': '58d7067d1d60ebd072c43bc6',
+        'name': 'Banana Bread'
       },
     ]);
 
@@ -77,7 +93,7 @@ function mockTrelloResponses() {
   const pathWithIdCapturing = /\/1\/cards\/(\w+)/;
   scope.get(pathWithIdCapturing)
     .query(queryObject => {
-      equal(queryObject.fields, 'id,name,desc,due,url');
+      equal(queryObject.fields, 'id,name,desc,due,url,labels');
       equal(queryObject.checklists, 'all');
       equal(queryObject.checklist_fields, 'name,id');
       return true;
@@ -91,11 +107,12 @@ function mockTrelloResponses() {
         'name': `Name of ${cardId}`,
         'due': fakeDueDate,
         'url': fakeUrl,
+        labels: fakeLabels,
         'checklists': [{
           checkItems: [
-            { id: "123123", name: "1 pound of dates"},
-            { id: "646464", name: "4 large yams"},
-          ],
+            { id: "123123", name: "1 pound of dates" },
+            { id: "646464", name: "4 large yams" },
+          ],          
           id: "59ae06d39f754ff22ca604ee",
           name: "Fruits Grown in Quebec",
         }],

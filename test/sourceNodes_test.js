@@ -34,6 +34,7 @@ describe('Graphql', function() {
       list_id: 'list-123',
       list_slug: 'slugified-list-name',
       list_name: 'regular list name',
+      labels: [],
       index: 34,
       id: 'card-333',
       slug: 'slugified-card-name',
